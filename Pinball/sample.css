@@ -1,0 +1,25 @@
+body{
+  background-color: #555;
+}
+h1{
+  background-color: #848484;
+  width: 1000px;
+  height: 1000px
+}
+h2{
+  background-color: #000;
+  width: 640px;
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+  color: #FFFFFF;
+}
+h3{
+  background-color: #FFF;
+  width: 640px;
+  height: 5px;
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+  color: #FFFFFF;
+}

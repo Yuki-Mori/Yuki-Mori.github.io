@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+  <link rel="stylesheet" href="Sample.css">
+  <script type="text/javascript">
+   function init()
+   {
+    var c = document.getElementById('canvas');
+    var cnt = c.getContext('2d');
+
+    cnt.shadowBlur = 10;
+    cnt.shadowColor = '#000000';
+
+    for (var i = 0; i < 50; i++) {
+     var x = parseInt(Math.random() * 200);
+     var y = parseInt(Math.random() * 200);
+     var g = parseInt(Math.random() * 200);
+     var b = parseInt(Math.random() * 200);
+
+     cnt.beginPath();
+     cnt.arc(x, y, 10, 0, Math.PI*2, false);
+     cnt.closePath();
+     var color = "rgb(255," + g + "," + b + ")";
+
+     cnt.fillStyle = color;
+     cnt.fill();
+    }
+   }
+  </script>
+ </head>
+ <body onload="init()">
+  <h1>商品の紹介</h1>
+  <canvas id="canvas", width="200", height="200"></canvas>
+ </body>
+</html>

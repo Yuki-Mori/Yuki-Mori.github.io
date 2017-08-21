@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+  <meta charset="UTF-8">
+  <title>Pinball</title>
+  <link rel="stylesheet" href="sample.css">
+  <script type="text/javascript">
+  var inputKey = new Array(); //キー取得配列
+  var rand = Math.floor( Math.random() * 620 ) ;
+  var x = 10 + rand; //ボール初期位置
+  var y = 10;
+  var r = 10; //ボール半径
+  var rect_x = 260; //横棒の初期位置
+  var rect_y = 400;
+  var dx = 5; //ボール諸速度
+  var dy = 5;
+  var moreDif = 1; //難易度
+  var drect = 10; //横棒速度
+  var length = 120; //横棒の長さ
+  //インターバル用変数
+  var t;
+  var p;
+  //スコア用変数
+  var scoa = 0;
+  var maxScoa = 0;
+  //SE用の変数
+  var a; //左右の辺に当たった音
+  var b; //上辺・横棒
+  var c; //ポーズ時
+  var d; //ゲームオーバー時
+
+  function init(){
+    t = window.setInterval("draw()", 1000/60); //60FPS
+    //SE宣言
+    a = document.getElementById("audio");
+    b = document.getElementById("audio2");
+    c = document.getElementById("audio3");
+    d = document.getElementById("audio4");
+    //背景用キャンパス
+    var cnvs02 = document.getElementById("canvas02");
+    var w = cnvs02.width;
+    var h = cnvs02.height;
+    var cnt2 = cnvs02.getContext("2d");
+    cnt2.fillStyle = "#000";
+    cnt2.beginPath();
+    cnt2.fillRect(0,0,w,h);
+    cnt2.closePath();
+    cnt2.fill();
+    //最高スコア表示（初期化）
+    document.getElementById("id_maxScoa").innerHTML="<h2>Max scoa : "+maxScoa+"</h2>";
+  }
+
+  function draw(){
+    //ゲーム用キャンパス描画
+    var cnvs01 = document.getElementById("canvas01");
+    var cnt = cnvs01.getContext("2d");
+    var w = cnvs01.width;
+    var h = cnvs01.height;
+    if(scoa > moreDif*1000){ //難易度による玉の速度変化
+      if(dx < 0)
+        dx = dx -1;
+      else
+        dx = dx + 1;
+      if(dy < 0)
+        dy = dy -1;
+      else
+        dy = dy + 1;
+      moreDif++;
+    }
+    //ボール描画
+    cnt.clearRect(0,0,w,h);
+    cnt.fillStyle = "#FFF";
+    cnt.beginPath();
+    cnt.arc(x, y, r, 0, Math.PI*2, false);
+    cnt.fillRect(rect_x, rect_y, length, 5);
+    cnt.closePath();
+    cnt.fill();
+    //キー取得
+    document.onkeydown = function(e){
+      inputKey[e.keyCode] = true;
+    };
+    document.onkeyup =function(e){
+      inputKey[e.keyCode] = false;
+    }
+    //Rキーが押された時、ポーズする
+    if(inputKey[82] == true){
+      inputKey[82] = false;
+      c.play();
+      clearInterval(t);
+      p = setInterval("pause()",1000/60);
+    }
+    //矢印キーが押された時の処理
+    if(inputKey[37] == true)rect_x = rect_x - drect;
+    if(inputKey[39] == true)rect_x = rect_x + drect;
+    if(rect_x < 0)rect_x = 0; //横棒が壁にあたった時の処理
+    if(rect_x > w - length)rect_x = w-length;
+    //ボール跳ね返り処理
+    if(x < r || x > w-r){
+      dx = -dx;
+      a.play();
+    }
+    if(y < r ||((x > rect_x-10 && x < rect_x + length+10) && y > rect_y-r)){
+      dy = -dy;
+      b.play();
+    }
+    else if(y >= rect_y-r+1){
+      //ゲームオーバー時処理
+      if(scoa > maxScoa)maxScoa = scoa;
+      document.getElementById("id_maxScoa").innerHTML="<h2>Max scoa : "+maxScoa+"</h2>";
+      inputKey[37] = false;
+      inputKey[39] = false;
+      d.play();
+      window.alert("Game Over!\nPush Enter to restart.");
+      scoa = 0;
+      rand = Math.floor( Math.random() * 620 ) ;
+      x = 10 + rand;
+      y = 10;
+      r = 10;
+      dx = 5;
+      dy = 5;
+      moreDif = 1;
+    }else{ //スコア表示
+      scoa++;
+      document.getElementById("id_scoa").innerHTML="<h2>Scoa : "+scoa+"</h2>";
+    }
+    //ゲームレベル表示
+    document.getElementById("id_level").innerHTML="<h2>Level : "+moreDif+"</h2>";
+    //ボール移動
+    x = x + dx;
+    y = y + dy;
+  }
+  //ポーズ処理
+  function pause(){
+    if(inputKey[82] == true){
+      c.play();
+      inputKey[82] = false;
+      clearInterval(p);
+      t = setInterval("draw()",1000/60);
+    }
+  }
+  </script>
+</head>
+<body onload="init()">
+  <div id="id_scoa"></div>
+  <div id="id_maxScoa"></div>
+  <div id="id_level"></div>
+  <h2>Pause Key : R</h2>
+  <h3></h3>
+  <canvas id="canvas01" width="640" height="480" style="position: absolute; left: 10; top: 20; z-index: 1;">
+    <audio id="audio" src="./SE/SE01.wav"></audio>
+    <audio id="audio2" src="./SE/SE01.wav"></audio>
+    <audio id="audio3" src="./SE/SE02.wav"></audio>
+    <audio id="audio4" src="./SE/SE03.wav"></audio>
+  </canvas>
+  <canvas id="canvas02" width="640" height="480" style="position: absolute; left: 10; top: 20; z-index: 0;"></canvas>
+</body>
+</html>
